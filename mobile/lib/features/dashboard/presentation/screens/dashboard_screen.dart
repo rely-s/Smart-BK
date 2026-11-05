@@ -45,11 +45,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int? _selectedMoodIndex;
 
   final List<_MoodItem> _moods = const [
-    _MoodItem(emoji: '😊', label: 'Senang', feedback: 'Energi positifmu berharga! Rawat terus suasana hatimu hari ini.'),
-    _MoodItem(emoji: '😌', label: 'Tenang', feedback: 'Kondisi emosi yang stabil adalah fondasi terbaik untuk fokus dan berkarya.'),
-    _MoodItem(emoji: '😐', label: 'Biasa', feedback: 'Hari yang santai juga baik. Luangkan jeda sejenak untuk hal yang kamu sukai.'),
-    _MoodItem(emoji: '😟', label: 'Cemas', feedback: 'Wajar merasa cemas. Tarik napas perlahan, Guru BK siap mendengarkan tanpa menghakimi.'),
-    _MoodItem(emoji: '😔', label: 'Lelah', feedback: 'Tubuh dan pikiranmu butuh jeda. Jangan ragu beristirahat atau bercerita ke Guru BK.'),
+    _MoodItem(
+      icon: CupertinoIcons.sun_max_fill,
+      tint: Color(0xFFFF9500),
+      label: 'Senang',
+      feedback: 'Energi positifmu berharga! Rawat terus suasana hatimu hari ini.',
+    ),
+    _MoodItem(
+      icon: CupertinoIcons.sparkles,
+      tint: Color(0xFF34C759),
+      label: 'Tenang',
+      feedback: 'Kondisi emosi yang stabil adalah fondasi terbaik untuk fokus dan berkarya.',
+    ),
+    _MoodItem(
+      icon: CupertinoIcons.equal_circle_fill,
+      tint: Color(0xFF007AFF),
+      label: 'Biasa',
+      feedback: 'Hari yang santai juga baik. Luangkan jeda sejenak untuk hal yang kamu sukai.',
+    ),
+    _MoodItem(
+      icon: CupertinoIcons.cloud_bolt_fill,
+      tint: Color(0xFF5856D6),
+      label: 'Cemas',
+      feedback: 'Wajar merasa cemas. Tarik napas perlahan, Guru BK siap mendengarkan tanpa menghakimi.',
+    ),
+    _MoodItem(
+      icon: CupertinoIcons.moon_fill,
+      tint: Color(0xFF8E8E93),
+      label: 'Lelah',
+      feedback: 'Tubuh dan pikiranmu butuh jeda. Jangan ragu beristirahat atau bercerita ke Guru BK.',
+    ),
   ];
 
   final List<_SearchSuggestion> _allSuggestions = const [
@@ -198,7 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ==========================================
   PreferredSizeWidget _buildIosHeader(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white.withValues(alpha: 0.95),
+      backgroundColor: const Color(0xFFF2F2F7).withValues(alpha: 0.94),
       elevation: 0,
       scrolledUnderElevation: 0.5,
       automaticallyImplyLeading: false,
@@ -206,13 +231,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(0.5),
         child: Container(
-          color: const Color(0x4D3C3C43), // iOS hairline separator (0.33pt)
+          color: const Color(0x263C3C43), // iOS hairline separator (0.33pt)
           height: 0.5,
         ),
       ),
       title: Row(
         children: [
-          // iOS Menu Button
           Builder(
             builder: (ctx) => GestureDetector(
               onTap: () => Scaffold.of(ctx).openDrawer(),
@@ -220,8 +244,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5EA), // iOS System Gray 5
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
                 ),
                 child: const Icon(
                   CupertinoIcons.line_horizontal_3,
@@ -231,67 +256,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
-
-          // App Icon Squircle
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF007AFF), Color(0xFF0040DD)], // iOS Blue Gradient
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              CupertinoIcons.heart_fill,
-              color: Colors.white,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // Title & Subtitle
-          Expanded(
+          const SizedBox(width: 12),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Flexible(
-                      child: Text(
-                        'Smart BK Care',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF000000),
-                          letterSpacing: -0.4,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF007AFF),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'Smart BK Care',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF000000),
+                    letterSpacing: -0.4,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const Text(
+                Text(
                   'SUMATERA BARAT',
                   style: TextStyle(
                     fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF8E8E93), // iOS Secondary Label
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF8E8E93),
                     letterSpacing: 0.8,
                   ),
                   maxLines: 1,
@@ -311,8 +298,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFFE5E5EA),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -329,7 +317,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 7,
                       height: 7,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF3B30), // iOS System Red
+                        color: const Color(0xFFFF3B30),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
@@ -353,10 +341,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18), // iOS smooth continuous squircle
+        borderRadius: BorderRadius.circular(18), // iOS continuous squircle
+        border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A000000), // iOS ultra subtle elevation
+            color: Color(0x06000000), // iOS ultra subtle elevation
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -436,7 +425,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     color: Color(0xFF3C3C43), // iOS Secondary Label
-                    height: 1.4,
+                    height: 1.45,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -445,8 +434,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const Row(
                   children: [
                     Icon(
-                      CupertinoIcons.lock_fill,
-                      size: 13,
+                      CupertinoIcons.lock_shield_fill,
+                      size: 14,
                       color: Color(0xFF007AFF),
                     ),
                     SizedBox(width: 6),
@@ -511,9 +500,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x0A000000),
+                color: Color(0x06000000),
                 blurRadius: 8,
                 offset: Offset(0, 1),
               ),
@@ -536,26 +526,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFFEBF5FF) : const Color(0xFFF2F2F7),
+                            color: isSelected ? const Color(0xFFEBF5FF) : const Color(0xFFF8F9FA),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF007AFF) : Colors.transparent,
-                              width: 1.5,
+                              color: isSelected ? const Color(0xFF007AFF) : const Color(0xFFE5E5EA),
+                              width: isSelected ? 1.5 : 0.5,
                             ),
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(mood.emoji, style: const TextStyle(fontSize: 22)),
-                              const SizedBox(height: 3),
+                              Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFF007AFF)
+                                      : mood.tint.withValues(alpha: 0.12),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  mood.icon,
+                                  size: 15,
+                                  color: isSelected ? Colors.white : mood.tint,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
                               Text(
                                 mood.label,
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSelected ? const Color(0xFF007AFF) : const Color(0xFF636366),
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                  color: isSelected ? const Color(0xFF007AFF) : const Color(0xFF48484A),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -578,13 +582,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(CupertinoIcons.heart_fill, size: 16, color: Color(0xFF007AFF)),
-                      const SizedBox(width: 8),
+                      Icon(
+                        _moods[_selectedMoodIndex!].icon,
+                        size: 18,
+                        color: _moods[_selectedMoodIndex!].tint,
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           _moods[_selectedMoodIndex!].feedback,
                           style: const TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             color: Color(0xFF1C1C1E),
                             height: 1.35,
                           ),
@@ -890,14 +898,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 6,
+              color: Color(0x06000000),
+              blurRadius: 8,
               offset: Offset(0, 1),
             ),
           ],
@@ -905,15 +914,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // iOS Squircle App-Icon Badge
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // iOS Squircle App-Icon Badge
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 19),
+                ),
+                const Icon(
+                  CupertinoIcons.chevron_forward,
+                  size: 13,
+                  color: Color(0xFFC7C7CC),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             Text(
@@ -921,8 +940,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: const TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF000000),
+                color: Color(0xFF1C1C1E),
                 height: 1.2,
+                letterSpacing: -0.2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -937,7 +957,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -974,17 +994,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF007AFF), Color(0xFF0040DD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: const Color(0xFF0F172A), // Apple Midnight Slate
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF1E293B), width: 0.5),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x33007AFF),
-            blurRadius: 14,
-            offset: Offset(0, 5),
+            color: Color(0x140F172A),
+            blurRadius: 16,
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -994,7 +1011,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             right: 4,
             bottom: -6,
             child: Opacity(
-              opacity: 0.12,
+              opacity: 0.08,
               child: CustomPaint(
                 size: const Size(100, 120),
                 painter: _JamGadangSilhouettePainter(),
@@ -1010,7 +1027,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(9999),
                   ),
                   child: const Text(
@@ -1018,7 +1035,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: TextStyle(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: Color(0xFF93C5FD),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -1045,7 +1062,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     'Konseling membantu kamu menata pikiran dan melangkah pasti menuju masa depan gemilang.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFFDBEAFE),
+                      color: Color(0xFF94A3B8),
                       height: 1.4,
                     ),
                   ),
@@ -1073,11 +1090,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0040DD),
+                                color: Color(0xFF0F172A),
                               ),
                             ),
                             SizedBox(width: 4),
-                            Icon(CupertinoIcons.arrow_right, size: 13, color: Color(0xFF0040DD)),
+                            Icon(CupertinoIcons.arrow_right, size: 13, color: Color(0xFF0F172A)),
                           ],
                         ),
                       ),
@@ -1096,7 +1113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFFDBEAFE),
+                            color: Color(0xFFCBD5E1),
                           ),
                         ),
                       ],
@@ -1971,12 +1988,14 @@ enum _SearchTarget {
 }
 
 class _MoodItem {
-  final String emoji;
+  final IconData icon;
+  final Color tint;
   final String label;
   final String feedback;
 
   const _MoodItem({
-    required this.emoji,
+    required this.icon,
+    required this.tint,
     required this.label,
     required this.feedback,
   });
