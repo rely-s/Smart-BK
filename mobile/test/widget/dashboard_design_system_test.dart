@@ -20,7 +20,7 @@ void main() {
     await sl.reset();
   });
 
-  testWidgets('Dashboard UI Design System Conformance (DESIGN.md & Stitch)', (WidgetTester tester) async {
+  testWidgets('Dashboard UI matches https://smart-bk-care-sumatera-barat.ai.studio', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(390 * 2, 844 * 2);
     tester.view.devicePixelRatio = 2.0;
 
@@ -37,7 +37,7 @@ void main() {
       phoneNumber: '081267890123',
       role: UserRole.student,
       schoolId: 'a11bbd91-382a-4389-a541-11910cf90001',
-      schoolName: 'SMAN 1 Padang',
+      schoolName: 'SMA Negeri 1 Padang',
       isActive: true,
       gradeClass: 'XI-F2',
       major: 'Fase F (Kurikulum Merdeka)',
@@ -62,47 +62,60 @@ void main() {
     await tester.pumpAndSettle();
 
     // 1. Header elements
+    expect(find.text('Smart BK Care'), findsOneWidget);
+    expect(find.text('SUMATERA BARAT'), findsOneWidget);
+
+    // 2. Student Sanctuary Hero Card
+    expect(find.text('Ruang Aman Siswa SMA Negeri 1 Padang'), findsOneWidget);
     expect(find.text('Halo, Fajri! 👋'), findsOneWidget);
-    expect(find.text('SMAN 1 Padang • XI-F2'), findsOneWidget);
-    expect(find.text('Siswa'), findsOneWidget);
+    expect(
+      find.text('Ada hal yang mengganjal atau ingin kamu ceritakan hari ini? Guru BK siap mendengarkan tanpa menghakimi.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Kerahasiaan data dijamin & terlindungi kode etik konseling'),
+      findsOneWidget,
+    );
 
-    // 2. Search bar per DESIGN.md
-    expect(find.text('Cari topik konseling, artikel, atau panduan...'), findsOneWidget);
+    // 3. Search bar per AI Studio
+    expect(find.text('Cari info materi, curhat, atau jadwal konseling...'), findsOneWidget);
 
-    // 3. Category Chips
-    expect(find.text('Semua Layanan'), findsOneWidget);
-    expect(find.text('Curhat & Chat'), findsOneWidget);
+    // 4. Section Layanan Bimbingan Konseling & Badge
+    expect(find.text('Layanan Bimbingan Konseling'), findsOneWidget);
+    expect(find.text('Terlindungi & Rahasia'), findsOneWidget);
 
-    // 4. Hero Sanctuary Card
-    expect(find.text('Aman & Rahasia'), findsOneWidget);
-    expect(find.text('Ruang Bimbingan & Konseling Digital'), findsOneWidget);
-    expect(find.text('100% Bebas Stigma'), findsOneWidget);
-    expect(find.text('3 Guru BK Online'), findsOneWidget);
+    // 5. 2-Column Feature Service Grid (6 Services per AI Studio)
+    expect(find.text('Curhat & Konseling'), findsOneWidget);
+    expect(find.text('Chat, voice, video'), findsOneWidget);
+    expect(find.text('Mulai sesi'), findsOneWidget);
 
-    // 5. 2-Column Feature Service Grid (6 Services per DESIGN.md domain tokens)
-    expect(find.text('Curhat & Konsultasi'), findsOneWidget);
-    expect(find.text('Chat, voice, atau video bersama Guru BK'), findsOneWidget);
+    expect(find.text('Tes Kesehatan Mental'), findsOneWidget);
+    expect(find.text('Refleksi mandiri'), findsOneWidget);
+    expect(find.text('Cek kondisi'), findsOneWidget);
 
-    expect(find.text('Skrining Mandiri'), findsOneWidget);
-    expect(find.text('Deteksi kecemasan & stres non-klinis (GAD-7)'), findsOneWidget);
+    expect(find.text('Lapor Kasus'), findsOneWidget);
+    expect(find.text('Aman & anonim'), findsOneWidget);
+    expect(find.text('Laporkan'), findsOneWidget);
 
-    expect(find.text('Laporkan Kasus'), findsOneWidget);
-    expect(find.text('Aduan aman, 100% anonim & anti-perundungan'), findsOneWidget);
-
-    expect(find.text('Literasi Jiwa'), findsOneWidget);
-    expect(find.text('Artikel, podcast & nilai Adat Basandi Syarak'), findsOneWidget);
+    expect(find.text('Materi Edukasi'), findsOneWidget);
+    expect(find.text('Artikel & tips remaja'), findsOneWidget);
+    expect(find.text('Buka modul'), findsOneWidget);
 
     expect(find.text('Jadwal Konseling'), findsOneWidget);
-    expect(find.text('Booking sesi temu & pengingat konseling'), findsOneWidget);
+    expect(find.text('Reservasi sesi'), findsOneWidget);
+    expect(find.text('Pilih waktu'), findsOneWidget);
 
-    expect(find.text('Komunitas Sebaya'), findsOneWidget);
-    expect(find.text('Forum diskusi & saling dukung sesama siswa'), findsOneWidget);
+    expect(find.text('Komunitas Siswa'), findsOneWidget);
+    expect(find.text('Ruang berbagi sebaya'), findsOneWidget);
+    expect(find.text('Gabung circle'), findsOneWidget);
 
-    // 6. Crisis / Alert Button per DESIGN.md Section 1
-    expect(find.text('Pusat Perlindungan Darurat & Anti-Bullying'), findsOneWidget);
-    expect(find.text('Lapor Perundungan / Krisis Sekarang'), findsOneWidget);
+    // 6. Banner Inspirasi Pelajar Minang
+    expect(find.text('INSPIRASI PELAJAR MINANG'), findsOneWidget);
+    expect(find.text('“Cerita Itu Kekuatan, Bukan Kelemahan”'), findsOneWidget);
+    expect(find.text('Baca Kisah Fajar'), findsOneWidget);
+    expect(find.text('Konselor Berlisensi'), findsOneWidget);
 
-    // 7. Bottom Navigation Bar (5 slots per DESIGN.md Section 7)
+    // 7. Bottom Navigation Bar (5 slots per AI Studio)
     expect(find.text('Beranda'), findsOneWidget);
     expect(find.text('Konseling'), findsOneWidget);
     expect(find.text('Edukasi'), findsOneWidget);
