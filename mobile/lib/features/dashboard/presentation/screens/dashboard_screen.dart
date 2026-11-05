@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/enums.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
 /// Dashboard Screen Smart BK Care (Beranda)
-/// Mengimplementasikan 100% spesifikasi antarmuka visual https://smart-bk-care-sumatera-barat.ai.studio:
-/// - Header: Menu drawer, Logo gradient dengan ikon volunteer_activism, judul "Smart BK Care" dengan blue dot, subtitle "SUMATERA BARAT", notifikasi bell dengan unread badge.
-/// - Sidebar Drawer: Identitas siswa (FR), 6 Layanan BK dengan badge status, Menu Lainnya, dan Role Switcher.
-/// - Student Sanctuary Hero Card: Kartu putih bersih dengan border halus, siluet watermark Gonjong Minangkabau, badge hijau berdenyut "Ruang Aman Siswa SMA Negeri 1 Padang", sapaan ramah, dan jaminan kerahasiaan data.
-/// - Search Bar: Input pencarian modern dengan icon tune dan daftar rekomendasi cepat interaktif.
-/// - Grid Layanan Bimbingan Konseling: 6 kartu layanan 2 kolom dengan palet warna spesifik domain dan micro-copy persis AI Studio.
-/// - Banner Inspirasi Pelajar Minang: Kartu gradien biru Jam Gadang dengan dialog "Kisah Fajar: Cerita Itu Kekuatan".
-/// - Modal Komunitas Pelajar Sebaya (Circle Pelajar).
+/// Didesain dengan estetika modern, natural, dan human-crafted:
+/// - Tipografi berbobot dengan hierarki visual yang jelas.
+/// - Palet warna terkontrol dan berkelas (tidak norak/generik).
+/// - Micro-interaction: Mood Tracker harian ("Bagaimana suasana hatimu hari ini?") interaktif.
+/// - Student Sanctuary Hero Card berlatar putih bersih dengan siluet Gonjong Minang yang anggun.
+/// - Fitur layanan konseling dengan kartu taktil responsif.
+/// - Pojok Inspirasi Pelajar Minang dengan dialog bacaan reflektif.
+/// - Sidebar Drawer dan dialog interaktif komunitas.
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onNavigateToCounseling;
   final VoidCallback onNavigateToEducation;
@@ -42,7 +41,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isSearchActive = false;
   String _searchQuery = '';
 
-  // Data rekomendasi pencarian cepat sesuai smart-bk-care-sumatera-barat.ai.studio
+  // State mood harian interaktif
+  int? _selectedMoodIndex;
+
+  final List<_MoodItem> _moods = const [
+    _MoodItem(emoji: '😊', label: 'Senang', feedback: 'Energi positifmu berharga! Terus jaga ritme belajar dan istirahatmu ya.'),
+    _MoodItem(emoji: '😌', label: 'Tenang', feedback: 'Kondisi emosi yang stabil adalah fondasi terbaik untuk fokus hari ini.'),
+    _MoodItem(emoji: '😐', label: 'Biasa', feedback: 'Hari yang santai juga baik. Luangkan waktu sejenak untuk hal yang kamu sukai.'),
+    _MoodItem(emoji: '😟', label: 'Cemas', feedback: 'Wajar merasa cemas. Tarik napas perlahan, Guru BK siap mendengarkan tanpa menghakimi.'),
+    _MoodItem(emoji: '😔', label: 'Lelah', feedback: 'Tubuh dan pikiranmu butuh jeda. Jangan ragu beristirahat atau bercerita ke Guru BK.'),
+  ];
+
+  // Rekomendasi pencarian cepat
   final List<_SearchSuggestion> _allSuggestions = const [
     _SearchSuggestion(
       label: 'Curhat dengan Guru BK',
@@ -71,7 +81,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ),
   ];
 
-  // Komunitas circle siswa yang diikuti (default: circle-1 aktif)
   final Set<String> _joinedCircles = {'circle-1'};
 
   @override
@@ -127,7 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (state is Authenticated) {
           final user = state.user;
           return Scaffold(
-            backgroundColor: const Color(0xFFFAF8FF),
+            backgroundColor: const Color(0xFFF8FAFC),
             appBar: _buildCustomHeader(context),
             drawer: _buildSidebarDrawer(context, user),
             body: GestureDetector(
@@ -138,27 +147,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 36),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (user.isStudent) ...[
-                      // 1. Student Sanctuary Hero Card (White Card with Gonjong Watermark)
+                      // 1. Student Sanctuary Hero Card
                       _buildStudentSanctuaryHeroCard(user),
                       const SizedBox(height: 16),
 
-                      // 2. Search Bar dengan Live Suggestions Dropdown
+                      // 2. Interactive Daily Mood Check-In
+                      _buildMoodCheckInWidget(),
+                      const SizedBox(height: 16),
+
+                      // 3. Search Bar Modern
                       _buildSearchBar(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
-                      // 3. Layanan Bimbingan Konseling (Two-Column Grid)
+                      // 4. Layanan Bimbingan Konseling Grid
                       _buildServicesSection(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
-                      // 4. Inspirasi Pelajar Minang Banner (Jam Gadang Watermark)
+                      // 5. Inspirasi Pelajar Minang Banner
                       _buildInspirasiMinangBanner(),
                     ] else ...[
-                      // Mode Tampilan Khusus Guru BK
+                      // Counselor View
                       _buildCounselorHeroCard(user),
                       const SizedBox(height: 16),
                       _buildCounselorOverview(),
@@ -170,9 +183,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         }
         return const Scaffold(
-          backgroundColor: Color(0xFFFAF8FF),
+          backgroundColor: Color(0xFFF8FAFC),
           body: Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+            child: CircularProgressIndicator(color: Color(0xFF0F52BA)),
           ),
         );
       },
@@ -180,15 +193,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 1. APP BAR HEADER (PERSIS AI STUDIO)
+  // 1. HEADER MODERN & BERSIH
   // ==========================================
   PreferredSizeWidget _buildCustomHeader(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white.withValues(alpha: 0.98),
+      backgroundColor: Colors.white,
       elevation: 0,
-      scrolledUnderElevation: 1,
+      scrolledUnderElevation: 0.5,
       automaticallyImplyLeading: false,
-      titleSpacing: 16,
+      titleSpacing: 18,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1.0),
         child: Container(
@@ -198,29 +211,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       title: Row(
         children: [
-          // Tombol Buka Menu Sidebar Drawer
+          // Drawer Menu Button
           Builder(
             builder: (ctx) => InkWell(
               onTap: () => Scaffold.of(ctx).openDrawer(),
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                width: 36,
-                height: 36,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
                 ),
                 child: const Icon(
                   Icons.menu_rounded,
-                  size: 22,
-                  color: Color(0xFF334155),
+                  size: 20,
+                  color: Color(0xFF1E293B),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
 
-          // Logo Gradien Smart BK Care
+          // Logo Gradient
           Container(
             width: 38,
             height: 38,
@@ -233,8 +247,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF003C90).withValues(alpha: 0.18),
-                  blurRadius: 4,
+                  color: const Color(0xFF003C90).withValues(alpha: 0.2),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -245,32 +259,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
               size: 20,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
 
-          // Judul Smart BK Care & Subtitle SUMATERA BARAT
+          // Judul Smart BK Care & Subtitle
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'Smart BK Care',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF131B2E),
-                        letterSpacing: -0.3,
-                        height: 1.1,
+                    const Flexible(
+                      child: Text(
+                        'Smart BK Care',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.4,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(width: 4),
                     Container(
-                      width: 6,
-                      height: 6,
+                      width: 5,
+                      height: 5,
                       decoration: const BoxDecoration(
                         color: Color(0xFF0F52BA),
                         shape: BoxShape.circle,
@@ -278,15 +294,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 2),
                 const Text(
                   'SUMATERA BARAT',
                   style: TextStyle(
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF64748B),
-                    letterSpacing: 0.9,
-                    height: 1.1,
+                    letterSpacing: 1.0,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -297,26 +311,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       actions: [
-        // Tombol Notifikasi Siswa dengan Badge Titik Merah
         Padding(
-          padding: const EdgeInsets.only(right: 16),
+          padding: const EdgeInsets.only(right: 18),
           child: InkWell(
             onTap: widget.onNavigateToNotification,
-            borderRadius: BorderRadius.circular(9999),
+            borderRadius: BorderRadius.circular(12),
             child: Container(
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
                 color: Colors.white,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -324,7 +330,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const Icon(
                     Icons.notifications_none_rounded,
                     size: 20,
-                    color: Color(0xFF64748B),
+                    color: Color(0xFF475569),
                   ),
                   Positioned(
                     top: 8,
@@ -333,7 +339,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 7,
                       height: 7,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDC2626),
+                        color: const Color(0xFFE11D48),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
@@ -349,467 +355,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 2. SIDEBAR DRAWER (PERSIS AI STUDIO)
-  // ==========================================
-  Widget _buildSidebarDrawer(BuildContext context, UserEntity user) {
-    return Drawer(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
-      child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            // Header Drawer Gradien dengan Siluet Gonjong
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 44, 16, 16),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF003C90), Color(0xFF0F52BA)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: -10,
-                    bottom: -10,
-                    child: Opacity(
-                      opacity: 0.12,
-                      child: CustomPaint(
-                        size: const Size(100, 50),
-                        painter: _MinangGonjongSilhouettePainter(),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.volunteer_activism_rounded,
-                                  color: Colors.white,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Smart BK Care',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                  Text(
-                                    'SUMATERA BARAT',
-                                    style: TextStyle(
-                                      color: Color(0xFFBFDBFE),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 10,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
-                            onPressed: () => Navigator.of(context).pop(),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                user.fullName.isNotEmpty
-                                    ? user.fullName.split(' ').map((e) => e[0]).take(2).join()
-                                    : 'FR',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user.fullName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    user.schoolName ?? 'SMA Negeri 1 Padang',
-                                    style: const TextStyle(
-                                      color: Color(0xFFBFDBFE),
-                                      fontSize: 10.5,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                                borderRadius: BorderRadius.circular(9999),
-                                border: Border.all(color: const Color(0xFF6EE7B7).withValues(alpha: 0.4)),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.circle, color: Color(0xFF6EE7B7), size: 6),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Aktif',
-                                    style: TextStyle(
-                                      color: Color(0xFFD1FAE5),
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Daftar Menu Layanan BK Sesuai ai_studio.js
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'FITUR LAYANAN BK',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
-                            color: Color(0xFF94A3B8),
-                          ),
-                        ),
-                        Text(
-                          '6 Layanan',
-                          style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildDrawerItem(
-                    icon: Icons.psychology_rounded,
-                    iconColor: const Color(0xFF0284C7),
-                    bgColor: const Color(0xFFF0F9FF),
-                    title: 'Skrining Perasaan',
-                    subtitle: 'Deteksi cemas, stres & suasana hati',
-                    badge: '3 Topik',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToScreening();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.forum_rounded,
-                    iconColor: const Color(0xFF003C90),
-                    bgColor: const Color(0xFFEFF6FF),
-                    title: 'Ruang Sesi Chat',
-                    subtitle: 'Konseling privat & terenkripsi BK',
-                    badge: 'Online',
-                    isBadgePulse: true,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToCounseling();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.calendar_month_rounded,
-                    iconColor: const Color(0xFF0D9488),
-                    bgColor: const Color(0xFFF0FDFA),
-                    title: 'Reservasi Konseling',
-                    subtitle: 'Jadwal tatap muka / daring resmi',
-                    badge: 'Dispensasi',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToCounseling();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.shield_rounded,
-                    iconColor: const Color(0xFFE11D48),
-                    bgColor: const Color(0xFFFFF1F2),
-                    title: 'Lapor Rahasia',
-                    subtitle: 'Pengaduan perundungan 100% aman',
-                    badge: 'Anonim',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToReport();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.menu_book_rounded,
-                    iconColor: const Color(0xFF7C3AED),
-                    bgColor: const Color(0xFFF5F3FF),
-                    title: 'Edukasi & Literasi',
-                    subtitle: 'Video, modul, artikel & podcast',
-                    badge: 'Modul Gratis',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToEducation();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.bar_chart_rounded,
-                    iconColor: const Color(0xFFD97706),
-                    bgColor: const Color(0xFFFFFBEB),
-                    title: 'Analitik Sumbar',
-                    subtitle: 'Data psikososial 19 Kab/Kota',
-                    badge: 'Dinas Sumbar',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showInfographicsDialog();
-                    },
-                  ),
-
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Divider(color: Color(0xFFF1F5F9), height: 1),
-                  ),
-
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text(
-                      'MENU LAINNYA',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.home_rounded,
-                    title: 'Beranda Utama',
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.supervisor_account_rounded,
-                    title: 'Dashboard Guru BK',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showRoleSwitcherDialog(context);
-                    },
-                  ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.account_circle_rounded,
-                    title: 'Profil & Identitas Siswa',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToProfile();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color bgColor,
-    required String title,
-    required String subtitle,
-    required String badge,
-    bool isBadgePulse = false,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E293B),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isBadgePulse ? const Color(0xFFECFDF5) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(9999),
-                          border: isBadgePulse
-                              ? Border.all(color: const Color(0xFFA7F3D0))
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (isBadgePulse) ...[
-                              Container(
-                                width: 5,
-                                height: 5,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF10B981),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 3),
-                            ],
-                            Text(
-                              badge,
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: isBadgePulse
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      color: Color(0xFF64748B),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFFCBD5E1)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSimpleDrawerItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: const Color(0xFF64748B)),
-            const SizedBox(width: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF334155),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ==========================================
-  // 3. STUDENT SANCTUARY HERO CARD (KARTU PUTIH PERSIS AI STUDIO)
+  // 2. STUDENT SANCTUARY HERO CARD
   // ==========================================
   Widget _buildStudentSanctuaryHeroCard(UserEntity user) {
     final firstName = user.fullName.split(' ').first;
@@ -817,45 +363,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // Siluet Watermark Gonjong Minangkabau di Sudut Kanan Bawah
+          // Siluet Watermark Minang Halus
           Positioned(
-            right: -8,
-            bottom: -8,
+            right: -10,
+            bottom: -10,
             child: Opacity(
-              opacity: 0.06,
+              opacity: 0.04,
               child: CustomPaint(
-                size: const Size(120, 100),
+                size: const Size(130, 100),
                 painter: _MinangGonjongSilhouettePainter(color: const Color(0xFF003C90)),
               ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Badge Pill: Ruang Aman Siswa SMA Negeri 1 Padang (Pulsing Dot Hijau)
+                // Ruang Aman Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECFDF5),
+                    color: const Color(0xFFF0FDF4),
                     borderRadius: BorderRadius.circular(9999),
-                    border: Border.all(
-                      color: const Color(0xFFA7F3D0).withValues(alpha: 0.7),
-                    ),
+                    border: Border.all(color: const Color(0xFFBBF7D0)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -864,7 +408,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: 7,
                         height: 7,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF10B981),
+                          color: Color(0xFF16A34A),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -875,7 +419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF065F46),
+                            color: Color(0xFF15803D),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -884,21 +428,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // Greeting Headline: Halo, Fajar! 👋
+                // Sapaan Ramah
                 Text(
                   'Halo, $firstName! 👋',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF131B2E),
-                    letterSpacing: -0.4,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 6),
 
-                // Subtitle: Ada hal yang mengganjal atau ingin kamu ceritakan...
+                // Pertanyaan Empatik
                 const Text(
                   'Ada hal yang mengganjal atau ingin kamu ceritakan hari ini? Guru BK siap mendengarkan tanpa menghakimi.',
                   style: TextStyle(
@@ -907,22 +451,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     height: 1.45,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // Jaminan Keamanan & Kode Etik Konseling
-                const Row(
+                // Note Perlindungan Privasi
+                Row(
                   children: [
-                    Icon(
-                      Icons.lock_rounded,
-                      size: 14,
-                      color: Color(0xFF0F52BA),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.lock_outline_rounded,
+                        size: 13,
+                        color: Color(0xFF0F52BA),
+                      ),
                     ),
-                    SizedBox(width: 6),
-                    Expanded(
+                    const SizedBox(width: 8),
+                    const Expanded(
                       child: Text(
                         'Kerahasiaan data dijamin & terlindungi kode etik konseling',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 11.5,
                           color: Color(0xFF64748B),
                           fontWeight: FontWeight.w500,
                         ),
@@ -941,7 +492,138 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 4. SEARCH BAR DENGAN LIVE DROPDOWN
+  // 3. INTERACTIVE DAILY MOOD CHECK-IN
+  // ==========================================
+  Widget _buildMoodCheckInWidget() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'Bagaimana perasaanmu saat ini?',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Refleksi Hari Ini',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Color(0xFF94A3B8),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(_moods.length, (index) {
+              final mood = _moods[index];
+              final isSelected = _selectedMoodIndex == index;
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectedMoodIndex = index;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFF0F52BA) : const Color(0xFFE2E8F0),
+                          width: isSelected ? 1.5 : 1.0,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            mood.emoji,
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            mood.label,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected ? const Color(0xFF003C90) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+          if (_selectedMoodIndex != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFBFDBFE)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.favorite_rounded, size: 16, color: Color(0xFF0F52BA)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _moods[_selectedMoodIndex!].feedback,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF1E3A8A),
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ==========================================
+  // 4. SEARCH BAR MODERN & MINIMALIS
   // ==========================================
   Widget _buildSearchBar() {
     final filtered = _allSuggestions.where((s) {
@@ -952,40 +634,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       children: [
         Container(
-          height: 46,
+          height: 48,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: const Color(0xFFE2E8F0)),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF0F172A).withValues(alpha: 0.02),
-                blurRadius: 3,
+                blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
             ],
           ),
           child: Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               const Icon(
                 Icons.search_rounded,
                 color: Color(0xFF94A3B8),
                 size: 20,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF131B2E),
+                    color: Color(0xFF0F172A),
                   ),
                   decoration: const InputDecoration(
                     hintText: 'Cari info materi, curhat, atau jadwal konseling...',
                     hintStyle: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.5,
                       color: Color(0xFF94A3B8),
                     ),
                     border: InputBorder.none,
@@ -1001,27 +683,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   visualDensity: VisualDensity.compact,
                 ),
               IconButton(
-                icon: const Icon(Icons.tune_rounded, size: 18, color: Color(0xFF94A3B8)),
+                icon: const Icon(Icons.tune_rounded, size: 18, color: Color(0xFF64748B)),
                 onPressed: widget.onNavigateToEducation,
                 visualDensity: VisualDensity.compact,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 6),
             ],
           ),
         ),
 
-        // Dropdown Saran Pencarian Cepat
         if (_isSearchActive && _searchQuery.isNotEmpty) ...[
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE2E8F0)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 8,
+                  blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -1046,12 +727,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ...filtered.map(
                     (s) => InkWell(
                       onTap: () => _handleSuggestionTap(s.target),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         child: Row(
                           children: [
-                            Icon(s.icon, size: 18, color: const Color(0xFF003C90)),
+                            Icon(s.icon, size: 18, color: const Color(0xFF0F52BA)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -1088,13 +769,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 5. GRID LAYANAN BIMBINGAN KONSELING (6 KARTU 2-KOLOM)
+  // 5. GRID LAYANAN BIMBINGAN KONSELING
   // ==========================================
   Widget _buildServicesSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header Seksi: Layanan Bimbingan Konseling + Badge Terlindungi & Rahasia
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -1102,10 +782,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Text(
                 'Layanan Bimbingan Konseling',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF131B2E),
-                  letterSpacing: -0.2,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.3,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1142,7 +822,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         const SizedBox(height: 12),
 
-        // Grid 6 Kartu (2 Kolom)
+        // Grid 6 Kartu Layanan (2 Kolom)
         Row(
           children: [
             Expanded(
@@ -1243,7 +923,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -1251,7 +931,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF0F172A).withValues(alpha: 0.02),
-              blurRadius: 3,
+              blurRadius: 4,
               offset: const Offset(0, 1),
             ),
           ],
@@ -1268,19 +948,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: Icon(icon, color: iconColor, size: 20),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF131B2E),
+                color: Color(0xFF0F172A),
                 height: 1.2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Text(
               subtitle,
               style: const TextStyle(
@@ -1298,7 +978,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Text(
                     cta,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w700,
                       color: iconColor,
                     ),
@@ -1321,34 +1001,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 6. BANNER INSPIRASI PELAJAR MINANG (JAM GADANG)
+  // 6. BANNER INSPIRASI PELAJAR MINANG
   // ==========================================
   Widget _buildInspirasiMinangBanner() {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F52BA), Color(0xFF1E40AF)],
+          colors: [Color(0xFF0F52BA), Color(0xFF1E3A8A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F52BA).withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF0F52BA).withValues(alpha: 0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // Siluet Watermark Jam Gadang di Sudut Kanan Bawah
+          // Siluet Jam Gadang
           Positioned(
             right: 4,
             bottom: -6,
             child: Opacity(
-              opacity: 0.15,
+              opacity: 0.12,
               child: CustomPaint(
                 size: const Size(100, 120),
                 painter: _JamGadangSilhouettePainter(),
@@ -1357,11 +1037,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tag Inspirasi Pelajar Minang
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
@@ -1380,7 +1059,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // Judul
                 const SizedBox(
                   width: 240,
                   child: Text(
@@ -1395,7 +1073,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 6),
 
-                // Subtitle
                 const SizedBox(
                   width: 240,
                   child: Text(
@@ -1409,7 +1086,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // Baris Tombol Aksi & Badge Konselor Berlisensi
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   spacing: 12,
@@ -1478,7 +1154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 7. DIALOG: KISAH FAJAR (PERSIS AI STUDIO)
+  // 7. DIALOG: KISAH FAJAR
   // ==========================================
   void _showStoryDialog() {
     showDialog(
@@ -1602,7 +1278,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 8. DIALOG: KOMUNITAS SISWA (CIRCLE PELAJAR)
+  // 8. DIALOG: KOMUNITAS SISWA
   // ==========================================
   void _showCommunityDialog() {
     showDialog(
@@ -1780,8 +1456,460 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 9. DIALOG INFOGRAFIS ARSITEKTUR SUMBAR
+  // 9. SIDEBAR DRAWER
   // ==========================================
+  Widget _buildSidebarDrawer(BuildContext context, UserEntity user) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 44, 16, 16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF003C90), Color(0xFF0F52BA)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -10,
+                    bottom: -10,
+                    child: Opacity(
+                      opacity: 0.12,
+                      child: CustomPaint(
+                        size: const Size(100, 50),
+                        painter: _MinangGonjongSilhouettePainter(),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.volunteer_activism_rounded,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Smart BK Care',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                  Text(
+                                    'SUMATERA BARAT',
+                                    style: TextStyle(
+                                      color: Color(0xFFBFDBFE),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+                            onPressed: () => Navigator.of(context).pop(),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                user.fullName.isNotEmpty
+                                    ? user.fullName.split(' ').map((e) => e[0]).take(2).join()
+                                    : 'FR',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.fullName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    user.schoolName ?? 'SMA Negeri 1 Padang',
+                                    style: const TextStyle(
+                                      color: Color(0xFFBFDBFE),
+                                      fontSize: 10.5,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                                borderRadius: BorderRadius.circular(9999),
+                                border: Border.all(color: const Color(0xFF6EE7B7).withValues(alpha: 0.4)),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.circle, color: Color(0xFF6EE7B7), size: 6),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Aktif',
+                                    style: TextStyle(
+                                      color: Color(0xFFD1FAE5),
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'FITUR LAYANAN BK',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                            color: Color(0xFF94A3B8),
+                          ),
+                        ),
+                        Text(
+                          '6 Layanan',
+                          style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  _buildDrawerItem(
+                    icon: Icons.psychology_rounded,
+                    iconColor: const Color(0xFF0284C7),
+                    bgColor: const Color(0xFFF0F9FF),
+                    title: 'Skrining Perasaan',
+                    subtitle: 'Deteksi cemas, stres & suasana hati',
+                    badge: '3 Topik',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToScreening();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.forum_rounded,
+                    iconColor: const Color(0xFF003C90),
+                    bgColor: const Color(0xFFEFF6FF),
+                    title: 'Ruang Sesi Chat',
+                    subtitle: 'Konseling privat & terenkripsi BK',
+                    badge: 'Online',
+                    isBadgePulse: true,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToCounseling();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.calendar_month_rounded,
+                    iconColor: const Color(0xFF0D9488),
+                    bgColor: const Color(0xFFF0FDFA),
+                    title: 'Reservasi Konseling',
+                    subtitle: 'Jadwal tatap muka / daring resmi',
+                    badge: 'Dispensasi',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToCounseling();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.shield_rounded,
+                    iconColor: const Color(0xFFE11D48),
+                    bgColor: const Color(0xFFFFF1F2),
+                    title: 'Lapor Rahasia',
+                    subtitle: 'Pengaduan perundungan 100% aman',
+                    badge: 'Anonim',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToReport();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.menu_book_rounded,
+                    iconColor: const Color(0xFF7C3AED),
+                    bgColor: const Color(0xFFF5F3FF),
+                    title: 'Edukasi & Literasi',
+                    subtitle: 'Video, modul, artikel & podcast',
+                    badge: 'Modul Gratis',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToEducation();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.bar_chart_rounded,
+                    iconColor: const Color(0xFFD97706),
+                    bgColor: const Color(0xFFFFFBEB),
+                    title: 'Analitik Sumbar',
+                    subtitle: 'Data psikososial 19 Kab/Kota',
+                    badge: 'Dinas Sumbar',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showInfographicsDialog();
+                    },
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Divider(color: Color(0xFFF1F5F9), height: 1),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(
+                      'MENU LAINNYA',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ),
+                  _buildSimpleDrawerItem(
+                    icon: Icons.home_rounded,
+                    title: 'Beranda Utama',
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  _buildSimpleDrawerItem(
+                    icon: Icons.supervisor_account_rounded,
+                    title: 'Dashboard Guru BK',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showRoleSwitcherDialog(context);
+                    },
+                  ),
+                  _buildSimpleDrawerItem(
+                    icon: Icons.account_circle_rounded,
+                    title: 'Profil & Identitas Siswa',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      widget.onNavigateToProfile();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+    required String title,
+    required String subtitle,
+    required String badge,
+    bool isBadgePulse = false,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1E293B),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isBadgePulse ? const Color(0xFFECFDF5) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(9999),
+                          border: isBadgePulse
+                              ? Border.all(color: const Color(0xFFA7F3D0))
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isBadgePulse) ...[
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF10B981),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                            ],
+                            Text(
+                              badge,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: isBadgePulse
+                                    ? const Color(0xFF047857)
+                                    : const Color(0xFF64748B),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: Color(0xFF64748B),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFFCBD5E1)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSimpleDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: const Color(0xFF64748B)),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showInfographicsDialog() {
     showDialog(
       context: context,
@@ -1856,9 +1984,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // ==========================================
-  // 10. DIALOG ROLE SWITCHER (SISWA / GURU BK / DINAS)
-  // ==========================================
   void _showRoleSwitcherDialog(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final state = authBloc.state;
@@ -2012,7 +2137,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2104,6 +2229,18 @@ enum _SearchTarget {
   education,
 }
 
+class _MoodItem {
+  final String emoji;
+  final String label;
+  final String feedback;
+
+  const _MoodItem({
+    required this.emoji,
+    required this.label,
+    required this.feedback,
+  });
+}
+
 class _SearchSuggestion {
   final String label;
   final IconData icon;
@@ -2136,7 +2273,6 @@ class _CommunityCircle {
   });
 }
 
-/// CustomPainter untuk Siluet Gonjong Minangkabau (Watermark)
 class _MinangGonjongSilhouettePainter extends CustomPainter {
   final Color color;
 
@@ -2152,7 +2288,6 @@ class _MinangGonjongSilhouettePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Menggambar siluet kurva lengkung atap Gonjong Minangkabau
     path.moveTo(w * 0.05, h * 0.85);
     path.quadraticBezierTo(w * 0.30, h * 0.75, w * 0.45, h * 0.40);
     path.quadraticBezierTo(w * 0.50, h * 0.15, w * 0.50, h * 0.05);
@@ -2167,7 +2302,6 @@ class _MinangGonjongSilhouettePainter extends CustomPainter {
   bool shouldRepaint(covariant _MinangGonjongSilhouettePainter oldDelegate) => oldDelegate.color != color;
 }
 
-/// CustomPainter untuk Siluet Jam Gadang Bukittinggi (Watermark)
 class _JamGadangSilhouettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -2179,7 +2313,6 @@ class _JamGadangSilhouettePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Badan menara Jam Gadang dan atap Gonjong
     path.moveTo(w * 0.42, h);
     path.lineTo(w * 0.42, h * 0.55);
     path.lineTo(w * 0.36, h * 0.55);
@@ -2205,7 +2338,6 @@ class _JamGadangSilhouettePainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
-    // Titik lingkaran jam pada menara
     final circlePaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
