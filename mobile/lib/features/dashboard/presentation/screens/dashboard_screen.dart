@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/enums.dart';
@@ -5,14 +6,14 @@ import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
 /// Dashboard Screen Smart BK Care (Beranda)
-/// Didesain dengan estetika modern, natural, dan human-crafted:
-/// - Tipografi berbobot dengan hierarki visual yang jelas.
-/// - Palet warna terkontrol dan berkelas (tidak norak/generik).
-/// - Micro-interaction: Mood Tracker harian ("Bagaimana suasana hatimu hari ini?") interaktif.
-/// - Student Sanctuary Hero Card berlatar putih bersih dengan siluet Gonjong Minang yang anggun.
-/// - Fitur layanan konseling dengan kartu taktil responsif.
-/// - Pojok Inspirasi Pelajar Minang dengan dialog bacaan reflektif.
-/// - Sidebar Drawer dan dialog interaktif komunitas.
+/// Mengimplementasikan Apple iOS Human Interface Guidelines (HIG) secara komprehensif:
+/// - iOS System Grouped Background (#F2F2F7) dan Inset Grouped Card (#FFFFFF).
+/// - iOS Cupertino Icons (SF Symbols style).
+/// - iOS Large Title Navigation Bar dengan hairline divider.
+/// - iOS Cupertino Search Bar dengan rounded corners.
+/// - Interactive Daily Mood Pulse berbasis iOS segmented controls.
+/// - Apple App Store "Today" style featured story banner.
+/// - iOS ActionSheet / Modal Sheet dialogs.
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onNavigateToCounseling;
   final VoidCallback onNavigateToEducation;
@@ -41,42 +42,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isSearchActive = false;
   String _searchQuery = '';
 
-  // State mood harian interaktif
   int? _selectedMoodIndex;
 
   final List<_MoodItem> _moods = const [
-    _MoodItem(emoji: '😊', label: 'Senang', feedback: 'Energi positifmu berharga! Terus jaga ritme belajar dan istirahatmu ya.'),
-    _MoodItem(emoji: '😌', label: 'Tenang', feedback: 'Kondisi emosi yang stabil adalah fondasi terbaik untuk fokus hari ini.'),
-    _MoodItem(emoji: '😐', label: 'Biasa', feedback: 'Hari yang santai juga baik. Luangkan waktu sejenak untuk hal yang kamu sukai.'),
+    _MoodItem(emoji: '😊', label: 'Senang', feedback: 'Energi positifmu berharga! Rawat terus suasana hatimu hari ini.'),
+    _MoodItem(emoji: '😌', label: 'Tenang', feedback: 'Kondisi emosi yang stabil adalah fondasi terbaik untuk fokus dan berkarya.'),
+    _MoodItem(emoji: '😐', label: 'Biasa', feedback: 'Hari yang santai juga baik. Luangkan jeda sejenak untuk hal yang kamu sukai.'),
     _MoodItem(emoji: '😟', label: 'Cemas', feedback: 'Wajar merasa cemas. Tarik napas perlahan, Guru BK siap mendengarkan tanpa menghakimi.'),
     _MoodItem(emoji: '😔', label: 'Lelah', feedback: 'Tubuh dan pikiranmu butuh jeda. Jangan ragu beristirahat atau bercerita ke Guru BK.'),
   ];
 
-  // Rekomendasi pencarian cepat
   final List<_SearchSuggestion> _allSuggestions = const [
     _SearchSuggestion(
       label: 'Curhat dengan Guru BK',
-      icon: Icons.chat_bubble_rounded,
+      icon: CupertinoIcons.chat_bubble_2_fill,
       target: _SearchTarget.counseling,
     ),
     _SearchSuggestion(
       label: 'Cek Kecemasan Ujian',
-      icon: Icons.psychology_rounded,
+      icon: CupertinoIcons.waveform_path_ecg,
       target: _SearchTarget.screening,
     ),
     _SearchSuggestion(
       label: 'Reservasi Konseling Tatap Muka',
-      icon: Icons.event_rounded,
+      icon: CupertinoIcons.calendar,
       target: _SearchTarget.counseling,
     ),
     _SearchSuggestion(
       label: 'Lapor Perundungan Anonim',
-      icon: Icons.shield_rounded,
+      icon: CupertinoIcons.shield_fill,
       target: _SearchTarget.report,
     ),
     _SearchSuggestion(
       label: 'Modul Mengatasi Stres',
-      icon: Icons.menu_book_rounded,
+      icon: CupertinoIcons.book_fill,
       target: _SearchTarget.education,
     ),
   ];
@@ -136,9 +135,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (state is Authenticated) {
           final user = state.user;
           return Scaffold(
-            backgroundColor: const Color(0xFFF8FAFC),
-            appBar: _buildCustomHeader(context),
-            drawer: _buildSidebarDrawer(context, user),
+            backgroundColor: const Color(0xFFF2F2F7), // Apple iOS System Grouped Background
+            appBar: _buildIosHeader(context),
+            drawer: _buildIosDrawer(context, user),
             body: GestureDetector(
               onTap: () {
                 if (_searchFocusNode.hasFocus) {
@@ -146,35 +145,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }
               },
               child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 36),
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(), // iOS signature bouncing scroll
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (user.isStudent) ...[
-                      // 1. Student Sanctuary Hero Card
-                      _buildStudentSanctuaryHeroCard(user),
+                      // 1. Student Sanctuary Card (iOS Inset Grouped)
+                      _buildIosStudentSanctuaryCard(user),
                       const SizedBox(height: 16),
 
-                      // 2. Interactive Daily Mood Check-In
-                      _buildMoodCheckInWidget(),
+                      // 2. Interactive Daily Mood Check-In (iOS Style)
+                      _buildIosMoodCheckIn(),
                       const SizedBox(height: 16),
 
-                      // 3. Search Bar Modern
-                      _buildSearchBar(),
+                      // 3. iOS Search Bar
+                      _buildIosSearchBar(),
                       const SizedBox(height: 20),
 
-                      // 4. Layanan Bimbingan Konseling Grid
-                      _buildServicesSection(),
+                      // 4. Layanan Bimbingan Konseling Grid (iOS App Store Grid)
+                      _buildIosServicesSection(),
                       const SizedBox(height: 20),
 
-                      // 5. Inspirasi Pelajar Minang Banner
-                      _buildInspirasiMinangBanner(),
+                      // 5. Inspirasi Pelajar Minang (Apple "Today" Card)
+                      _buildIosInspirasiMinangBanner(),
                     ] else ...[
-                      // Counselor View
-                      _buildCounselorHeroCard(user),
+                      // Counselor Portal View
+                      _buildIosCounselorCard(user),
                       const SizedBox(height: 16),
-                      _buildCounselorOverview(),
+                      _buildIosCounselorOverview(),
                     ],
                   ],
                 ),
@@ -183,9 +184,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         }
         return const Scaffold(
-          backgroundColor: Color(0xFFF8FAFC),
+          backgroundColor: Color(0xFFF2F2F7),
           body: Center(
-            child: CircularProgressIndicator(color: Color(0xFF0F52BA)),
+            child: CupertinoActivityIndicator(radius: 14),
           ),
         );
       },
@@ -193,75 +194,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 1. HEADER MODERN & BERSIH
+  // 1. iOS APP BAR & NAVIGATION HEADER
   // ==========================================
-  PreferredSizeWidget _buildCustomHeader(BuildContext context) {
+  PreferredSizeWidget _buildIosHeader(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white.withValues(alpha: 0.95),
       elevation: 0,
       scrolledUnderElevation: 0.5,
       automaticallyImplyLeading: false,
-      titleSpacing: 18,
+      titleSpacing: 16,
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1.0),
+        preferredSize: const Size.fromHeight(0.5),
         child: Container(
-          color: const Color(0xFFE2E8F0),
-          height: 1.0,
+          color: const Color(0x4D3C3C43), // iOS hairline separator (0.33pt)
+          height: 0.5,
         ),
       ),
       title: Row(
         children: [
-          // Drawer Menu Button
+          // iOS Menu Button
           Builder(
-            builder: (ctx) => InkWell(
+            builder: (ctx) => GestureDetector(
               onTap: () => Scaffold.of(ctx).openDrawer(),
-              borderRadius: BorderRadius.circular(12),
               child: Container(
-                width: 38,
-                height: 38,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+                  color: const Color(0xFFE5E5EA), // iOS System Gray 5
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
-                  Icons.menu_rounded,
-                  size: 20,
-                  color: Color(0xFF1E293B),
+                  CupertinoIcons.line_horizontal_3,
+                  size: 18,
+                  color: Color(0xFF1C1C1E),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
 
-          // Logo Gradient
+          // App Icon Squircle
           Container(
-            width: 38,
-            height: 38,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF003C90), Color(0xFF0F52BA)],
+                colors: [Color(0xFF007AFF), Color(0xFF0040DD)], // iOS Blue Gradient
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF003C90).withValues(alpha: 0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
-              Icons.volunteer_activism_rounded,
+              CupertinoIcons.heart_fill,
               color: Colors.white,
-              size: 20,
+              size: 18,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
 
-          // Judul Smart BK Care & Subtitle
+          // Title & Subtitle
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,9 +266,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Text(
                         'Smart BK Care',
                         style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F172A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF000000),
                           letterSpacing: -0.4,
                         ),
                         maxLines: 1,
@@ -288,7 +280,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 5,
                       height: 5,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF0F52BA),
+                        color: Color(0xFF007AFF),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -299,8 +291,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF64748B),
-                    letterSpacing: 1.0,
+                    color: Color(0xFF8E8E93), // iOS Secondary Label
+                    letterSpacing: 0.8,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -312,25 +304,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 18),
-          child: InkWell(
+          padding: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
             onTap: widget.onNavigateToNotification,
-            borderRadius: BorderRadius.circular(12),
             child: Container(
-              width: 38,
-              height: 38,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: const Color(0xFFE5E5EA),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   const Icon(
-                    Icons.notifications_none_rounded,
-                    size: 20,
-                    color: Color(0xFF475569),
+                    CupertinoIcons.bell_fill,
+                    size: 18,
+                    color: Color(0xFF1C1C1E),
                   ),
                   Positioned(
                     top: 8,
@@ -339,7 +329,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 7,
                       height: 7,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE11D48),
+                        color: const Color(0xFFFF3B30), // iOS System Red
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
@@ -355,51 +345,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 2. STUDENT SANCTUARY HERO CARD
+  // 2. iOS INSET GROUPED CARD: STUDENT SANCTUARY
   // ==========================================
-  Widget _buildStudentSanctuaryHeroCard(UserEntity user) {
+  Widget _buildIosStudentSanctuaryCard(UserEntity user) {
     final firstName = user.fullName.split(' ').first;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(18), // iOS smooth continuous squircle
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Color(0x0A000000), // iOS ultra subtle elevation
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // Siluet Watermark Minang Halus
+          // Siluet Watermark Minang
           Positioned(
-            right: -10,
-            bottom: -10,
+            right: -8,
+            bottom: -8,
             child: Opacity(
-              opacity: 0.04,
+              opacity: 0.035,
               child: CustomPaint(
-                size: const Size(130, 100),
-                painter: _MinangGonjongSilhouettePainter(color: const Color(0xFF003C90)),
+                size: const Size(120, 95),
+                painter: _MinangGonjongSilhouettePainter(color: const Color(0xFF007AFF)),
               ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Ruang Aman Badge
+                // iOS Green Status Badge Pill
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
+                    color: const Color(0xFFE8F8EE),
                     borderRadius: BorderRadius.circular(9999),
-                    border: Border.all(color: const Color(0xFFBBF7D0)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -408,7 +396,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: 7,
                         height: 7,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF16A34A),
+                          color: Color(0xFF34C759), // iOS System Green
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -418,8 +406,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           'Ruang Aman Siswa ${user.schoolName ?? "SMA Negeri 1 Padang"}',
                           style: const TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF15803D),
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF248A3D),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -428,53 +416,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
 
-                // Sapaan Ramah
+                // Greeting Headline
                 Text(
                   'Halo, $firstName! 👋',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF000000),
                     letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 6),
 
-                // Pertanyaan Empatik
+                // Subtitle
                 const Text(
                   'Ada hal yang mengganjal atau ingin kamu ceritakan hari ini? Guru BK siap mendengarkan tanpa menghakimi.',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF475569),
-                    height: 1.45,
+                    color: Color(0xFF3C3C43), // iOS Secondary Label
+                    height: 1.4,
                   ),
                 ),
                 const SizedBox(height: 14),
 
-                // Note Perlindungan Privasi
-                Row(
+                // Jaminan Privasi iOS
+                const Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(
-                        Icons.lock_outline_rounded,
-                        size: 13,
-                        color: Color(0xFF0F52BA),
-                      ),
+                    Icon(
+                      CupertinoIcons.lock_fill,
+                      size: 13,
+                      color: Color(0xFF007AFF),
                     ),
-                    const SizedBox(width: 8),
-                    const Expanded(
+                    SizedBox(width: 6),
+                    Expanded(
                       child: Text(
                         'Kerahasiaan data dijamin & terlindungi kode etik konseling',
                         style: TextStyle(
-                          fontSize: 11.5,
-                          color: Color(0xFF64748B),
+                          fontSize: 11,
+                          color: Color(0xFF8E8E93),
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -492,140 +473,138 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 3. INTERACTIVE DAILY MOOD CHECK-IN
+  // 3. iOS DAILY MOOD CHECK-IN
   // ==========================================
-  Widget _buildMoodCheckInWidget() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
+  Widget _buildIosMoodCheckIn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
-                  'Bagaimana perasaanmu saat ini?',
+                  'BAGAIMANA SUASANA HATIMU?',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E293B),
+                    color: Color(0xFF8E8E93), // iOS Grouped Header
+                    letterSpacing: 0.6,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(width: 8),
-              Text(
+              const SizedBox(width: 8),
+              const Text(
                 'Refleksi Hari Ini',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Color(0xFF94A3B8),
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 11, color: Color(0xFF8E8E93)),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(_moods.length, (index) {
-              final mood = _moods[index];
-              final isSelected = _selectedMoodIndex == index;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedMoodIndex = index;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF0F52BA) : const Color(0xFFE2E8F0),
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            mood.emoji,
-                            style: const TextStyle(fontSize: 22),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            mood.label,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? const Color(0xFF003C90) : const Color(0xFF64748B),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0A000000),
+                blurRadius: 8,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: List.generate(_moods.length, (index) {
+                  final mood = _moods[index];
+                  final isSelected = _selectedMoodIndex == index;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMoodIndex = index;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFFEBF5FF) : const Color(0xFFF2F2F7),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFF007AFF) : Colors.transparent,
+                              width: 1.5,
                             ),
                           ),
-                        ],
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(mood.emoji, style: const TextStyle(fontSize: 22)),
+                              const SizedBox(height: 3),
+                              Text(
+                                mood.label,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? const Color(0xFF007AFF) : const Color(0xFF636366),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                  );
+                }),
+              ),
+              if (_selectedMoodIndex != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF2F2F7),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(CupertinoIcons.heart_fill, size: 16, color: Color(0xFF007AFF)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _moods[_selectedMoodIndex!].feedback,
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            color: Color(0xFF1C1C1E),
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              );
-            }),
+              ],
+            ],
           ),
-          if (_selectedMoodIndex != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFBFDBFE)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.favorite_rounded, size: 16, color: Color(0xFF0F52BA)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _moods[_selectedMoodIndex!].feedback,
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: Color(0xFF1E3A8A),
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // ==========================================
-  // 4. SEARCH BAR MODERN & MINIMALIS
+  // 4. iOS CUPERTINO SEARCH BAR
   // ==========================================
-  Widget _buildSearchBar() {
+  Widget _buildIosSearchBar() {
     final filtered = _allSuggestions.where((s) {
       if (_searchQuery.isEmpty) return true;
       return s.label.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -634,41 +613,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       children: [
         Container(
-          height: 48,
+          height: 38,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF0F172A).withValues(alpha: 0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
+            color: const Color(0xFFE3E3E8), // Apple System Gray 5
+            borderRadius: BorderRadius.circular(10), // iOS Search Field Radius
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
-              const SizedBox(width: 14),
               const Icon(
-                Icons.search_rounded,
-                color: Color(0xFF94A3B8),
-                size: 20,
+                CupertinoIcons.search,
+                color: Color(0xFF8E8E93),
+                size: 17,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF0F172A),
+                    color: Color(0xFF000000),
                   ),
                   decoration: const InputDecoration(
                     hintText: 'Cari info materi, curhat, atau jadwal konseling...',
                     hintStyle: TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFF94A3B8),
+                      fontSize: 12,
+                      color: Color(0xFF8E8E93),
                     ),
                     border: InputBorder.none,
                     isDense: true,
@@ -677,33 +648,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               if (_searchQuery.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
-                  onPressed: () => _searchController.clear(),
-                  visualDensity: VisualDensity.compact,
+                GestureDetector(
+                  onTap: () => _searchController.clear(),
+                  child: const Icon(CupertinoIcons.clear_circled_solid, size: 16, color: Color(0xFF8E8E93)),
                 ),
-              IconButton(
-                icon: const Icon(Icons.tune_rounded, size: 18, color: Color(0xFF64748B)),
-                onPressed: widget.onNavigateToEducation,
-                visualDensity: VisualDensity.compact,
-              ),
-              const SizedBox(width: 6),
             ],
           ),
         ),
 
+        // iOS Dropdown List
         if (_isSearchActive && _searchQuery.isNotEmpty) ...[
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: Color(0x14000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 4),
                 ),
               ],
             ),
@@ -718,32 +682,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF94A3B8),
+                      color: Color(0xFF8E8E93),
                       letterSpacing: 0.6,
                     ),
                   ),
                 ),
                 if (filtered.isNotEmpty)
                   ...filtered.map(
-                    (s) => InkWell(
+                    (s) => GestureDetector(
                       onTap: () => _handleSuggestionTap(s.target),
-                      borderRadius: BorderRadius.circular(10),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Row(
                           children: [
-                            Icon(s.icon, size: 18, color: const Color(0xFF0F52BA)),
+                            Icon(s.icon, size: 18, color: const Color(0xFF007AFF)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 s.label,
                                 style: const TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1E293B),
+                                  color: Color(0xFF1C1C1E),
                                 ),
                               ),
                             ),
+                            const Icon(CupertinoIcons.chevron_right, size: 14, color: Color(0xFFC7C7CC)),
                           ],
                         ),
                       ),
@@ -755,7 +722,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Center(
                       child: Text(
                         'Tidak ada menu terkait. Ketuk tombol konseling untuk bertanya langsung.',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -769,12 +736,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 5. GRID LAYANAN BIMBINGAN KONSELING
+  // 5. iOS GRID LAYANAN BIMBINGAN KONSELING
   // ==========================================
-  Widget _buildServicesSection() {
+  Widget _buildIosServicesSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // iOS Grouped Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -782,9 +750,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Text(
                 'Layanan Bimbingan Konseling',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF0F172A),
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF000000),
                   letterSpacing: -0.3,
                 ),
                 maxLines: 1,
@@ -795,24 +763,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: const Color(0xFFEBF5FF),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.lock_rounded,
+                    CupertinoIcons.lock_shield_fill,
                     size: 12,
-                    color: Color(0xFF0F52BA),
+                    color: Color(0xFF007AFF),
                   ),
                   SizedBox(width: 4),
                   Text(
                     'Terlindungi & Rahasia',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F52BA),
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF007AFF),
                     ),
                   ),
                 ],
@@ -822,29 +790,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         const SizedBox(height: 12),
 
-        // Grid 6 Kartu Layanan (2 Kolom)
+        // Grid 6 Kartu (2 Kolom)
         Row(
           children: [
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Curhat & Konseling',
                 subtitle: 'Chat, voice, video',
                 cta: 'Mulai sesi',
-                icon: Icons.chat_bubble_rounded,
-                iconColor: const Color(0xFF0F52BA),
-                bgColor: const Color(0xFFEFF6FF),
+                icon: CupertinoIcons.chat_bubble_2_fill,
+                iconColor: const Color(0xFF007AFF), // iOS Blue
+                bgColor: const Color(0xFFEBF5FF),
                 onTap: widget.onNavigateToCounseling,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Tes Kesehatan Mental',
                 subtitle: 'Refleksi mandiri',
                 cta: 'Cek kondisi',
-                icon: Icons.psychology_rounded,
-                iconColor: const Color(0xFF4F46E5),
-                bgColor: const Color(0xFFEEF2FF),
+                icon: CupertinoIcons.waveform_path_ecg,
+                iconColor: const Color(0xFF5856D6), // iOS Indigo
+                bgColor: const Color(0xFFEFEFFD),
                 onTap: widget.onNavigateToScreening,
               ),
             ),
@@ -854,25 +822,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Lapor Kasus',
                 subtitle: 'Aman & anonim',
                 cta: 'Laporkan',
-                icon: Icons.shield_rounded,
-                iconColor: const Color(0xFFE11D48),
-                bgColor: const Color(0xFFFFF1F2),
+                icon: CupertinoIcons.shield_fill,
+                iconColor: const Color(0xFFFF3B30), // iOS Red
+                bgColor: const Color(0xFFFFEBEA),
                 onTap: widget.onNavigateToReport,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Materi Edukasi',
                 subtitle: 'Artikel & tips remaja',
                 cta: 'Buka modul',
-                icon: Icons.menu_book_rounded,
-                iconColor: const Color(0xFFD97706),
-                bgColor: const Color(0xFFFFFBEB),
+                icon: CupertinoIcons.book_fill,
+                iconColor: const Color(0xFFFF9500), // iOS Orange
+                bgColor: const Color(0xFFFFF4E5),
                 onTap: widget.onNavigateToEducation,
               ),
             ),
@@ -882,26 +850,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Jadwal Konseling',
                 subtitle: 'Reservasi sesi',
                 cta: 'Pilih waktu',
-                icon: Icons.event_rounded,
-                iconColor: const Color(0xFF059669),
-                bgColor: const Color(0xFFECFDF5),
+                icon: CupertinoIcons.calendar,
+                iconColor: const Color(0xFF34C759), // iOS Green
+                bgColor: const Color(0xFFEBF9EE),
                 onTap: widget.onNavigateToCounseling,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildServiceCard(
+              child: _buildIosServiceCard(
                 title: 'Komunitas Siswa',
                 subtitle: 'Ruang berbagi sebaya',
                 cta: 'Gabung circle',
-                icon: Icons.groups_rounded,
-                iconColor: const Color(0xFF0891B2),
-                bgColor: const Color(0xFFECFEFF),
-                onTap: _showCommunityDialog,
+                icon: CupertinoIcons.person_3_fill,
+                iconColor: const Color(0xFF30B0C7), // iOS Teal
+                bgColor: const Color(0xFFEAF8FB),
+                onTap: _showIosCommunityDialog,
               ),
             ),
           ],
@@ -910,7 +878,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildServiceCard({
+  Widget _buildIosServiceCard({
     required String title,
     required String subtitle,
     required String cta,
@@ -919,26 +887,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required Color bgColor,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 1),
+              color: Color(0x0A000000),
+              blurRadius: 6,
+              offset: Offset(0, 1),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // iOS Squircle App-Icon Badge
             Container(
               width: 38,
               height: 38,
@@ -948,24 +915,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: Icon(icon, color: iconColor, size: 20),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               title,
               style: const TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                color: Color(0xFF000000),
                 height: 1.2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               subtitle,
               style: const TextStyle(
                 fontSize: 11,
-                color: Color(0xFF64748B),
+                color: Color(0xFF8E8E93),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -979,7 +946,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     cta,
                     style: TextStyle(
                       fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: iconColor,
                     ),
                     maxLines: 1,
@@ -988,8 +955,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(width: 2),
                 Icon(
-                  Icons.chevron_right_rounded,
-                  size: 14,
+                  CupertinoIcons.chevron_right,
+                  size: 12,
                   color: iconColor,
                 ),
               ],
@@ -1001,29 +968,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 6. BANNER INSPIRASI PELAJAR MINANG
+  // 6. APPLE "TODAY" STYLE FEATURED CARD
   // ==========================================
-  Widget _buildInspirasiMinangBanner() {
+  Widget _buildIosInspirasiMinangBanner() {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F52BA), Color(0xFF1E3A8A)],
+          colors: [Color(0xFF007AFF), Color(0xFF0040DD)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF0F52BA).withValues(alpha: 0.22),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Color(0x33007AFF),
+            blurRadius: 14,
+            offset: Offset(0, 5),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // Siluet Jam Gadang
           Positioned(
             right: 4,
             bottom: -6,
@@ -1064,7 +1030,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Text(
                     '“Cerita Itu Kekuatan, Bukan Kelemahan”',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                       height: 1.25,
@@ -1091,21 +1057,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   spacing: 12,
                   runSpacing: 8,
                   children: [
-                    InkWell(
-                      onTap: _showStoryDialog,
-                      borderRadius: BorderRadius.circular(9999),
+                    GestureDetector(
+                      onTap: _showIosStoryDialog,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(9999),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1115,11 +1073,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF003C90),
+                                color: Color(0xFF0040DD),
                               ),
                             ),
                             SizedBox(width: 4),
-                            Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF003C90)),
+                            Icon(CupertinoIcons.arrow_right, size: 13, color: Color(0xFF0040DD)),
                           ],
                         ),
                       ),
@@ -1128,9 +1086,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.verified_rounded,
+                          CupertinoIcons.checkmark_seal_fill,
                           size: 15,
-                          color: Color(0xFF34D399),
+                          color: Color(0xFF34C759), // iOS Green
                         ),
                         SizedBox(width: 4),
                         Text(
@@ -1154,123 +1112,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 7. DIALOG: KISAH FAJAR
+  // 7. iOS ACTION SHEET / MODAL STORY DIALOG
   // ==========================================
-  void _showStoryDialog() {
-    showDialog(
+  void _showIosStoryDialog() {
+    showCupertinoModalPopup(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.all(20),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'INSPIRASI PELAJAR MINANG',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF003C90),
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Kisah Fajar: “Cerita Itu Kekuatan”',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 20),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-                const Divider(color: Color(0xFFF1F5F9), height: 20),
-                const Text(
-                  '“Dulu, menjelang ujian kenaikan kelas dan pemilihan jurusan kuliah, saya sering begadang semalaman karena takut gagal. Pikiran saya penuh dengan ekspektasi orang tua dan rasa takut tertinggal oleh teman-teman.”',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF475569), height: 1.5),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // iOS Drag Grabber
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFDBEAFE)),
-                  ),
-                  child: const Text(
-                    '“Saya kira datang ke Ruang BK itu hanya untuk siswa yang bermasalah. Ternyata anggapan itu salah besar.”',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF003C90),
-                      height: 1.4,
-                    ),
+                    color: const Color(0xFFD1D1D6),
+                    borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  '“Bersama Ibu Rahmi Yunita di Ruang BK SMAN 1 Padang, saya belajar mengurai kecemasan saya satu per satu. Beliau tidak pernah menghakimi, melainkan membimbing saya menemukan gaya belajar yang tepat dan memetakan minat karir saya secara realistis.”',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF475569), height: 1.5),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  '“Kini saya merasa jauh lebih percaya diri menghadapi ujian. Jangan ragu bercerita, karena membuka perasaan bukanlah tanda kelemahan, melainkan awal dari kekuatanmu.”',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF475569), height: 1.5),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      widget.onNavigateToCounseling();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF003C90),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEBF5FF),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.chat_bubble_rounded, size: 16),
-                        SizedBox(width: 8),
-                        Text('Mulai Cerita dengan Guru BK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      ],
+                    child: const Text(
+                      'INSPIRASI PELAJAR MINANG',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF007AFF),
+                        letterSpacing: 0.6,
+                      ),
                     ),
                   ),
+                  GestureDetector(
+                    onTap: () => Navigator.of(ctx).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE5E5EA),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(CupertinoIcons.xmark, size: 14, color: Color(0xFF8E8E93)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Kisah Fajar: “Cerita Itu Kekuatan”',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF000000),
                 ),
-              ],
-            ),
+              ),
+              const Divider(color: Color(0xFFE5E5EA), height: 20),
+              const Text(
+                '“Dulu, menjelang ujian kenaikan kelas dan pemilihan jurusan kuliah, saya sering begadang semalaman karena takut gagal. Pikiran saya penuh dengan ekspektasi orang tua dan rasa takut tertinggal oleh teman-teman.”',
+                style: TextStyle(fontSize: 13, color: Color(0xFF3C3C43), height: 1.45),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F2F7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  '“Saya kira datang ke Ruang BK itu hanya untuk siswa yang bermasalah. Ternyata anggapan itu salah besar.”',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF007AFF),
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '“Bersama Ibu Rahmi Yunita di Ruang BK SMAN 1 Padang, saya belajar mengurai kecemasan saya satu per satu. Beliau tidak pernah menghakimi, melainkan membimbing saya menemukan gaya belajar yang tepat dan memetakan minat karir saya secara realistis.”',
+                style: TextStyle(fontSize: 13, color: Color(0xFF3C3C43), height: 1.45),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '“Kini saya merasa jauh lebih percaya diri menghadapi ujian. Jangan ragu bercerita, karena membuka perasaan bukanlah tanda kelemahan, melainkan awal dari kekuatanmu.”',
+                style: TextStyle(fontSize: 13, color: Color(0xFF3C3C43), height: 1.45),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton.filled(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  borderRadius: BorderRadius.circular(14),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    widget.onNavigateToCounseling();
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.chat_bubble_2_fill, size: 16),
+                      SizedBox(width: 8),
+                      Text('Mulai Cerita dengan Guru BK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -1278,10 +1245,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 8. DIALOG: KOMUNITAS SISWA
+  // 8. iOS MODAL DIALOG: KOMUNITAS SISWA
   // ==========================================
-  void _showCommunityDialog() {
-    showDialog(
+  void _showIosCommunityDialog() {
+    showCupertinoModalPopup(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
@@ -1292,8 +1259,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               members: '1.420 Siswa',
               desc: 'Ruang sharing tips lolos perguruan tinggi negeri, analisis nilai rapor, dan manajemen ambisi sehat.',
               badge: 'Akademik',
-              badgeBg: const Color(0xFFDBEAFE),
-              badgeColor: const Color(0xFF003C90),
+              badgeBg: const Color(0xFFEBF5FF),
+              badgeColor: const Color(0xFF007AFF),
             ),
             _CommunityCircle(
               id: 'circle-2',
@@ -1301,8 +1268,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               members: '890 Siswa',
               desc: 'Komunitas pelajar SMA/SMK se-Sumbar yang berkomitmen menciptakan iklim sekolah aman, inklusif, dan bebas perundungan.',
               badge: 'Sosial & Perlindungan',
-              badgeBg: const Color(0xFFD1FAE5),
-              badgeColor: const Color(0xFF065F46),
+              badgeBg: const Color(0xFFE8F8EE),
+              badgeColor: const Color(0xFF248A3D),
             ),
             _CommunityCircle(
               id: 'circle-3',
@@ -1310,143 +1277,156 @@ class _DashboardScreenState extends State<DashboardScreen> {
               members: '1.150 Siswa',
               desc: 'Saling bertukar cerita ringan, tips istirahat produktif, serta musik dan hobi pereda penat sekolah.',
               badge: 'Kesejahteraan',
-              badgeBg: const Color(0xFFFEF3C7),
-              badgeColor: const Color(0xFF92400E),
+              badgeBg: const Color(0xFFFFF4E5),
+              badgeColor: const Color(0xFFFF9500),
             ),
           ];
 
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            contentPadding: const EdgeInsets.all(20),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Komunitas Siswa Minang',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
-                              ),
-                            ),
-                            Text(
-                              'Circle Berbagi Sebaya Terpantau BK',
-                              style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded, size: 20),
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD1D1D6),
+                        borderRadius: BorderRadius.circular(2.5),
+                      ),
                     ),
-                    const Divider(color: Color(0xFFF1F5F9), height: 20),
-                    ...circles.map((c) {
-                      final isJoined = _joinedCircles.contains(c.id);
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isJoined ? const Color(0xFF0F52BA) : const Color(0xFFE2E8F0),
-                            width: isJoined ? 1.5 : 1.0,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Komunitas Siswa Minang',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF000000),
+                            ),
                           ),
+                          Text(
+                            'Circle Berbagi Sebaya Terpantau BK',
+                            style: TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.of(ctx).pop(),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE5E5EA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(CupertinoIcons.xmark, size: 14, color: Color(0xFF8E8E93)),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: c.badgeBg,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    c.badge,
-                                    style: TextStyle(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: c.badgeColor,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  c.members,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF64748B),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              c.name,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              c.desc,
-                              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.4),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setModalState(() {
-                                    if (isJoined) {
-                                      _joinedCircles.remove(c.id);
-                                    } else {
-                                      _joinedCircles.add(c.id);
-                                    }
-                                  });
-                                  setState(() {});
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: isJoined ? const Color(0xFFEFF6FF) : Colors.white,
-                                  foregroundColor: const Color(0xFF003C90),
-                                  side: BorderSide(
-                                    color: isJoined ? const Color(0xFF003C90) : const Color(0xFFCBD5E1),
-                                  ),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
-                                  visualDensity: VisualDensity.compact,
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Color(0xFFE5E5EA), height: 20),
+                  ...circles.map((c) {
+                    final isJoined = _joinedCircles.contains(c.id);
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF2F2F7),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: c.badgeBg,
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  isJoined ? '✓ Tergabung dalam Circle' : '+ Gabung Circle',
-                                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                                  c.badge,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: c.badgeColor,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                c.members,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF8E8E93),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            c.name,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF000000),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            c.desc,
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF636366), height: 1.35),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: CupertinoButton(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              color: isJoined ? Colors.white : const Color(0xFF007AFF),
+                              borderRadius: BorderRadius.circular(10),
+                              onPressed: () {
+                                setModalState(() {
+                                  if (isJoined) {
+                                    _joinedCircles.remove(c.id);
+                                  } else {
+                                    _joinedCircles.add(c.id);
+                                  }
+                                });
+                                setState(() {});
+                              },
+                              child: Text(
+                                isJoined ? '✓ Tergabung dalam Circle' : '+ Gabung Circle',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isJoined ? const Color(0xFF007AFF) : Colors.white,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
               ),
             ),
           );
@@ -1456,317 +1436,297 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ==========================================
-  // 9. SIDEBAR DRAWER
+  // 9. iOS SIDEBAR DRAWER
   // ==========================================
-  Widget _buildSidebarDrawer(BuildContext context, UserEntity user) {
+  Widget _buildIosDrawer(BuildContext context, UserEntity user) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF2F2F7),
       surfaceTintColor: Colors.transparent,
       child: SafeArea(
         top: false,
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.fromLTRB(16, 44, 16, 16),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF003C90), Color(0xFF0F52BA)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Stack(
+              padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Positioned(
-                    right: -10,
-                    bottom: -10,
-                    child: Opacity(
-                      opacity: 0.12,
-                      child: CustomPaint(
-                        size: const Size(100, 50),
-                        painter: _MinangGonjongSilhouettePainter(),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF007AFF), Color(0xFF0040DD)],
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(CupertinoIcons.heart_fill, color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 10),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.volunteer_activism_rounded,
-                                  color: Colors.white,
-                                  size: 22,
+                              Text(
+                                'Smart BK Care',
+                                style: TextStyle(
+                                  color: Color(0xFF000000),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Smart BK Care',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                  Text(
-                                    'SUMATERA BARAT',
-                                    style: TextStyle(
-                                      color: Color(0xFFBFDBFE),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 10,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                'SUMATERA BARAT',
+                                style: TextStyle(
+                                  color: Color(0xFF8E8E93),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 9.5,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
                             ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
-                            onPressed: () => Navigator.of(context).pop(),
-                            visualDensity: VisualDensity.compact,
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                user.fullName.isNotEmpty
-                                    ? user.fullName.split(' ').map((e) => e[0]).take(2).join()
-                                    : 'FR',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user.fullName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    user.schoolName ?? 'SMA Negeri 1 Padang',
-                                    style: const TextStyle(
-                                      color: Color(0xFFBFDBFE),
-                                      fontSize: 10.5,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                                borderRadius: BorderRadius.circular(9999),
-                                border: Border.all(color: const Color(0xFF6EE7B7).withValues(alpha: 0.4)),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.circle, color: Color(0xFF6EE7B7), size: 6),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Aktif',
-                                    style: TextStyle(
-                                      color: Color(0xFFD1FAE5),
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE5E5EA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(CupertinoIcons.xmark, size: 14, color: Color(0xFF8E8E93)),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2F2F7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'FITUR LAYANAN BK',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
-                            color: Color(0xFF94A3B8),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF007AFF),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            user.fullName.isNotEmpty
+                                ? user.fullName.split(' ').map((e) => e[0]).take(2).join()
+                                : 'FR',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        Text(
-                          '6 Layanan',
-                          style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.fullName,
+                                style: const TextStyle(
+                                  color: Color(0xFF000000),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                user.schoolName ?? 'SMA Negeri 1 Padang',
+                                style: const TextStyle(
+                                  color: Color(0xFF8E8E93),
+                                  fontSize: 11,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F8EE),
+                            borderRadius: BorderRadius.circular(9999),
+                          ),
+                          child: const Text(
+                            'Aktif',
+                            style: TextStyle(
+                              color: Color(0xFF248A3D),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  _buildDrawerItem(
-                    icon: Icons.psychology_rounded,
-                    iconColor: const Color(0xFF0284C7),
-                    bgColor: const Color(0xFFF0F9FF),
-                    title: 'Skrining Perasaan',
-                    subtitle: 'Deteksi cemas, stres & suasana hati',
-                    badge: '3 Topik',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToScreening();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.forum_rounded,
-                    iconColor: const Color(0xFF003C90),
-                    bgColor: const Color(0xFFEFF6FF),
-                    title: 'Ruang Sesi Chat',
-                    subtitle: 'Konseling privat & terenkripsi BK',
-                    badge: 'Online',
-                    isBadgePulse: true,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToCounseling();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.calendar_month_rounded,
-                    iconColor: const Color(0xFF0D9488),
-                    bgColor: const Color(0xFFF0FDFA),
-                    title: 'Reservasi Konseling',
-                    subtitle: 'Jadwal tatap muka / daring resmi',
-                    badge: 'Dispensasi',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToCounseling();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.shield_rounded,
-                    iconColor: const Color(0xFFE11D48),
-                    bgColor: const Color(0xFFFFF1F2),
-                    title: 'Lapor Rahasia',
-                    subtitle: 'Pengaduan perundungan 100% aman',
-                    badge: 'Anonim',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToReport();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.menu_book_rounded,
-                    iconColor: const Color(0xFF7C3AED),
-                    bgColor: const Color(0xFFF5F3FF),
-                    title: 'Edukasi & Literasi',
-                    subtitle: 'Video, modul, artikel & podcast',
-                    badge: 'Modul Gratis',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToEducation();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.bar_chart_rounded,
-                    iconColor: const Color(0xFFD97706),
-                    bgColor: const Color(0xFFFFFBEB),
-                    title: 'Analitik Sumbar',
-                    subtitle: 'Data psikososial 19 Kab/Kota',
-                    badge: 'Dinas Sumbar',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showInfographicsDialog();
-                    },
-                  ),
+                ],
+              ),
+            ),
+            const Divider(color: Color(0x4D3C3C43), height: 0.5),
+
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                children: [
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Divider(color: Color(0xFFF1F5F9), height: 1),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                     child: Text(
-                      'MENU LAINNYA',
+                      'FITUR LAYANAN BK',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: Color(0xFF94A3B8),
+                        letterSpacing: 0.6,
+                        color: Color(0xFF8E8E93),
                       ),
                     ),
                   ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.home_rounded,
-                    title: 'Beranda Utama',
-                    onTap: () => Navigator.of(context).pop(),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.waveform_path_ecg,
+                          iconColor: const Color(0xFF5856D6),
+                          bgColor: const Color(0xFFEFEFFD),
+                          title: 'Skrining Perasaan',
+                          subtitle: 'Deteksi cemas, stres & suasana hati',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToScreening();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.chat_bubble_2_fill,
+                          iconColor: const Color(0xFF007AFF),
+                          bgColor: const Color(0xFFEBF5FF),
+                          title: 'Ruang Sesi Chat',
+                          subtitle: 'Konseling privat & terenkripsi BK',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToCounseling();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.calendar,
+                          iconColor: const Color(0xFF34C759),
+                          bgColor: const Color(0xFFEBF9EE),
+                          title: 'Reservasi Konseling',
+                          subtitle: 'Jadwal tatap muka / daring resmi',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToCounseling();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.shield_fill,
+                          iconColor: const Color(0xFFFF3B30),
+                          bgColor: const Color(0xFFFFEBEA),
+                          title: 'Lapor Rahasia',
+                          subtitle: 'Pengaduan perundungan 100% aman',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToReport();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.book_fill,
+                          iconColor: const Color(0xFFFF9500),
+                          bgColor: const Color(0xFFFFF4E5),
+                          title: 'Edukasi & Literasi',
+                          subtitle: 'Video, modul, artikel & podcast',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToEducation();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.chart_bar_alt_fill,
+                          iconColor: const Color(0xFF30B0C7),
+                          bgColor: const Color(0xFFEAF8FB),
+                          title: 'Analitik Sumbar',
+                          subtitle: 'Data psikososial 19 Kab/Kota',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            _showIosInfographicsDialog();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.supervisor_account_rounded,
-                    title: 'Dashboard Guru BK',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _showRoleSwitcherDialog(context);
-                    },
+
+                  const SizedBox(height: 16),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: Text(
+                      'PENGATURAN & AKUN',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                        color: Color(0xFF8E8E93),
+                      ),
+                    ),
                   ),
-                  _buildSimpleDrawerItem(
-                    icon: Icons.account_circle_rounded,
-                    title: 'Profil & Identitas Siswa',
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onNavigateToProfile();
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.person_crop_circle_fill,
+                          iconColor: const Color(0xFF007AFF),
+                          bgColor: const Color(0xFFEBF5FF),
+                          title: 'Profil Siswa',
+                          subtitle: 'Detail identitas & status psikososial',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            widget.onNavigateToProfile();
+                          },
+                        ),
+                        const Divider(color: Color(0xFFE5E5EA), height: 0.5, indent: 54),
+                        _buildIosDrawerTile(
+                          icon: CupertinoIcons.arrow_2_squarepath,
+                          iconColor: const Color(0xFF5856D6),
+                          bgColor: const Color(0xFFEFEFFD),
+                          title: 'Simulasi Peran Pengguna',
+                          subtitle: 'Beralih ke tampilan Guru BK',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            _showIosRoleSwitcherDialog(context);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -1777,96 +1737,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDrawerItem({
+  Widget _buildIosDrawerTile({
     required IconData icon,
     required Color iconColor,
     required Color bgColor,
     required String title,
     required String subtitle,
-    required String badge,
-    bool isBadgePulse = false,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         child: Row(
           children: [
             Container(
-              width: 38,
-              height: 38,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: iconColor, size: 20),
+              child: Icon(icon, color: iconColor, size: 17),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E293B),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isBadgePulse ? const Color(0xFFECFDF5) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(9999),
-                          border: isBadgePulse
-                              ? Border.all(color: const Color(0xFFA7F3D0))
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (isBadgePulse) ...[
-                              Container(
-                                width: 5,
-                                height: 5,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF10B981),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 3),
-                            ],
-                            Text(
-                              badge,
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: isBadgePulse
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF000000),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 1),
                   Text(
                     subtitle,
                     style: const TextStyle(
                       fontSize: 10.5,
-                      color: Color(0xFF64748B),
+                      color: Color(0xFF8E8E93),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1874,270 +1788,89 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFFCBD5E1)),
+            const Icon(CupertinoIcons.chevron_right, size: 14, color: Color(0xFFC7C7CC)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSimpleDrawerItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: const Color(0xFF64748B)),
-            const SizedBox(width: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF334155),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showInfographicsDialog() {
-    showDialog(
+  void _showIosInfographicsDialog() {
+    showCupertinoDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.all(20),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Arsitektur Smart BK Care',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
-                ],
-              ),
-              const Divider(color: Color(0xFFF1F5F9), height: 16),
-              const Text(
-                'Ekosistem Bimbingan Konseling Digital Provinsi Sumatera Barat mengintegrasikan:',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF475569)),
-              ),
-              const SizedBox(height: 10),
-              _buildBulletPoint('19 Cabang Dinas Pendidikan Kabupaten/Kota se-Sumbar'),
-              _buildBulletPoint('Portal Terenkripsi Guru BK & Konselor Bersertifikat'),
-              _buildBulletPoint('Saluran Pelaporan Perundungan 100% Terlindungi ABKIN'),
-              _buildBulletPoint('Integrasi Nilai Filosofi Minangkabau "Adat Basandi Syarak"'),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF003C90),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Arsitektur Smart BK Care'),
+        content: const Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text(
+            'Ekosistem Bimbingan Konseling Digital Provinsi Sumatera Barat:\n\n'
+            '• 19 Cabang Dinas Pendidikan Kab/Kota\n'
+            '• Portal Terenkripsi Guru BK & Konselor\n'
+            '• Saluran Pengaduan 100% Terlindungi ABKIN\n'
+            '• Nilai Filosofis Adat Basandi Syarak',
+            textAlign: TextAlign.left,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildBulletPoint(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF10B981)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
-            ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Selesai'),
           ),
         ],
       ),
     );
   }
 
-  void _showRoleSwitcherDialog(BuildContext context) {
+  void _showIosRoleSwitcherDialog(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
-    final state = authBloc.state;
-    if (state is! Authenticated) return;
-
-    final currentRole = state.user.role;
-
-    showModalBottomSheet(
+    showCupertinoModalPopup(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE2E8F0),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Simulasi Peran Pengguna',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Pilih peran untuk menguji antarmuka pengguna sesuai hak akses:',
-                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-              ),
-              const SizedBox(height: 16),
-              _buildRoleOption(
-                ctx,
-                authBloc,
-                title: 'Siswa SMA Negeri 1 Padang',
-                subtitle: 'Akses santuari konseling, skrining, edukasi, lapor aduan anonim',
-                icon: Icons.school_rounded,
-                role: UserRole.student,
-                isSelected: currentRole == UserRole.student,
-              ),
-              const SizedBox(height: 8),
-              _buildRoleOption(
-                ctx,
-                authBloc,
-                title: 'Guru BK / Konselor Sekolah',
-                subtitle: 'Manajemen kasus, jadwal tatap muka, asesmen klinis, chat siswa',
-                icon: Icons.psychology_rounded,
-                role: UserRole.bkTeacher,
-                isSelected: currentRole == UserRole.bkTeacher,
-              ),
-            ],
+      builder: (ctx) => CupertinoActionSheet(
+        title: const Text('Simulasi Peran Pengguna'),
+        message: const Text('Pilih peran untuk menguji antarmuka:'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              authBloc.add(const SwitchRoleEvent(UserRole.student));
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Siswa SMA Negeri 1 Padang'),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildRoleOption(
-    BuildContext context,
-    AuthBloc authBloc, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required UserRole role,
-    required bool isSelected,
-  }) {
-    return InkWell(
-      onTap: () {
-        authBloc.add(SwitchRoleEvent(role));
-        Navigator.of(context).pop();
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF003C90) : const Color(0xFFE2E8F0),
-            width: isSelected ? 1.5 : 1.0,
+          CupertinoActionSheetAction(
+            onPressed: () {
+              authBloc.add(const SwitchRoleEvent(UserRole.bkTeacher));
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Guru BK / Konselor Sekolah'),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF003C90) : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: isSelected ? Colors.white : const Color(0xFF64748B),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? const Color(0xFF003C90) : const Color(0xFF1E293B),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: Color(0xFF003C90), size: 20),
-          ],
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: const Text('Batal'),
         ),
       ),
     );
   }
 
   // ==========================================
-  // VIEW MODE: GURU BK
+  // VIEW MODE: GURU BK (iOS Style)
   // ==========================================
-  Widget _buildCounselorHeroCard(UserEntity user) {
+  Widget _buildIosCounselorCard(UserEntity user) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF003C90), Color(0xFF0F52BA)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 8,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2146,54 +1879,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(9999),
+                  color: const Color(0xFFEBF5FF),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
                   'PORTAL GURU BK AKTIF',
-                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Color(0xFF007AFF), fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
                 user.schoolName ?? 'SMAN 1 Padang',
-                style: const TextStyle(color: Color(0xFFDBEAFE), fontSize: 11),
+                style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             'Selamat Bertugas, ${user.fullName}!',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF000000)),
           ),
           const SizedBox(height: 4),
           const Text(
             'Ruang pantau kesehatan mental siswa & penanganan aduan terenkripsi.',
-            style: TextStyle(fontSize: 12, color: Color(0xFFDBEAFE)),
+            style: TextStyle(fontSize: 12, color: Color(0xFF636366)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCounselorOverview() {
+  Widget _buildIosCounselorOverview() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Ringkasan Antrean Layanan BK',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF131B2E)),
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 6),
+          child: Text(
+            'RINGKASAN ANTREAN BK',
+            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF8E8E93)),
+          ),
         ),
-        const SizedBox(height: 10),
         Row(
           children: [
             Expanded(
-              child: _buildCounselorStatCard('3', 'Aduan Masuk', 'Perlu asesmen awal', const Color(0xFFFFF1F2), const Color(0xFFE11D48)),
+              child: _buildIosCounselorStatTile('3', 'Aduan Masuk', 'Perlu asesmen awal', const Color(0xFFFF3B30)),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _buildCounselorStatCard('5', 'Sesi Konseling', 'Hari ini', const Color(0xFFEFF6FF), const Color(0xFF003C90)),
+              child: _buildIosCounselorStatTile('5', 'Sesi Konseling', 'Hari ini', const Color(0xFF007AFF)),
             ),
           ],
         ),
@@ -2201,21 +1936,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildCounselorStatCard(String count, String label, String sub, Color bg, Color textCol) {
+  Widget _buildIosCounselorStatTile(String count, String label, String sub, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: textCol.withValues(alpha: 0.2)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 6,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(count, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textCol)),
+          Text(count, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: color)),
           const SizedBox(height: 2),
-          Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: textCol)),
-          Text(sub, style: TextStyle(fontSize: 10.5, color: textCol.withValues(alpha: 0.8))),
+          Text(label, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF000000))),
+          Text(sub, style: const TextStyle(fontSize: 10.5, color: Color(0xFF8E8E93))),
         ],
       ),
     );
